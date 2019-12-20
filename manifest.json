@@ -1,0 +1,16 @@
+{
+  "name": "Marvel Unlimited Series",
+  "version": "1.0",
+  "description": "Add a button to add a series of comics book to your library",
+  "manifest_version": 2,
+  "permissions": [
+    "activeTab",
+    "https://www.marvel.com/"
+  ],
+  "content_scripts": [{
+    "js": ["script.js"],
+    "matches": [
+      "https://www.marvel.com/comics/series/*"
+    ]
+  }]
+}
