@@ -20,8 +20,8 @@ logDiv.style.display = 'none'
 // Display button and logDiv
 const buttonParentNode = document.querySelector('.module .featured-item-info-wrap .featured-item-text')
 if (buttonParentNode) {
-    buttonParentNode.appendChild(addToLibraryButton)
-    buttonParentNode.appendChild(logDiv)
+  buttonParentNode.appendChild(addToLibraryButton)
+  buttonParentNode.appendChild(logDiv)
 }
 
 // Extract serie ID from the url
@@ -54,50 +54,56 @@ let comicsNumber = 0
 let xhr = new XMLHttpRequest()
 xhr.open('GET', 'https://www.marvel.com/comics/show_more?offset=0&tpl=..%2Fpartials%2Fcomic_issue%2Fcomics_singlerow_item.mtpl&byType=comic_series&limit=1&isDigital=1&byId=' + serieId)
 xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-        try {
-            let responseJson = JSON.parse(xhr.responseText)
-            if (responseJson.count) {
-                comicsNumber = responseJson.count
-                addToLibraryButtonInside.innerText = 'Add ' + comicsNumber + ' issue' + (comicsNumber > 0 ? 's' : '') + ' to Library'
-                registerAddEvent()
-            } else {
-                addToLibraryButtonInside.innerText = 'No Marvel Unlimited comics in this series.'
-            }
-        } catch (e) {
-            addToLibraryButtonInside.innerText = 'An error occured.'
-            throw new Error('Failed parse JSON')
-        }
+  if (xhr.readyState === 4) {
+    try {
+      let responseJson = JSON.parse(xhr.responseText)
+      if (responseJson.count) {
+        comicsNumber = responseJson.count
+        addToLibraryButtonInside.innerText = 'Add ' + comicsNumber + ' issue' + (comicsNumber > 0 ? 's' : '') + ' to Library'
+        registerAddEvent()
+      } else {
+        addToLibraryButtonInside.innerText = 'No Marvel Unlimited comics in this series.'
+      }
+    } catch (e) {
+      addToLibraryButtonInside.innerText = 'An error occured.'
+      throw new Error('Failed parse JSON')
     }
+  }
 }
 xhr.send()
 
 const registerAddEvent = function () {
-    addToLibraryButton.addEventListener('click', function (e) {
-        e.preventDefault()
-        let xhr = new XMLHttpRequest()
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-              if (xhr.status === 200) {
-                // try {
-                    const responseJson = JSON.parse(xhr.responseText)
-                    addToLibrary(responseJson.output)
-                // } catch (e) {
-                // addToLibraryButtonInside.innerText = 'An error occured.'
-                    // throw new Error('Failed parse JSON')
-                // }
-              } else {
-                addToLibraryButtonInside.innerText = 'An error occured.'
-                throw new Error('Failed to get comic list')
-              }
-            }
-        } // Implemented elsewhere.
-        xhr.open('GET', 'https://www.marvel.com/comics/show_more?offset=0&tpl=..%2Fpartials%2Fcomic_issue%2Fcomics_singlerow_item.mtpl&byType=comic_series&limit=' + comicsNumber + '&isDigital=1&byId=' + serieId, true)
-        xhr.send()
-    })
+  addToLibraryButton.addEventListener('click', function (e) {
+    e.preventDefault()
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          let responseJson;
+          try {
+            responseJson = JSON.parse(xhr.responseText)
+          } catch (e) {
+            addToLibraryButtonInside.innerText = 'An error occured.'
+            throw new Error('Failed parse JSON')
+          }
+          if (responseJson && responseJson.output) {
+            addToLibrary(responseJson.output)
+          }
+        } else {
+          addToLibraryButtonInside.innerText = 'An error occured.'
+          throw new Error('Failed to get comic list')
+        }
+      }
+    }
+    xhr.open('GET', 'https://www.marvel.com/comics/show_more?offset=0&tpl=..%2Fpartials%2Fcomic_issue%2Fcomics_singlerow_item.mtpl&byType=comic_series&limit=' + comicsNumber + '&isDigital=1&byId=' + serieId, true)
+    xhr.send()
+  })
 }
 
 const addToLibrary = function(html) {
+  const idRegex = /www\.marvel.com\/comics\/issue\/([0-9]*)/g
+  const nameRegex = ''
+
   const mainDocument = document.createElement('div')
   mainDocument.innerHTML = html
 
@@ -108,45 +114,33 @@ const addToLibrary = function(html) {
   for (let i = 0; i < comicIssues.length; i++) {
     const comicLink = comicIssues[i].getElementsByTagName('a')[0]
     const comicImage = comicIssues[i].getElementsByTagName('img')[0]
-    if (!comicLink) return
-    const comicId = comicLink.getAttribute('href').match(/www\.marvel.com\/comics\/issue\/([0-9]*)/g)
-    console.log(comicId)
-    if (!comicId) return;
+    if (!comicLink) continue
+    idRegexResult = idRegex.exec(comicLink.getAttribute('href'))
+    if (!idRegexResult || !idRegexResult[1]) {
+      continue
+    }
+    const comicId = idRegexResult[1]
+    let comicTitle = (comicImage.getAttribute('title') || comicId).trim();
 
-    // let p = document.createElement('p')
-    // p.innerHTML = 'Adding <i>' + comicId + '</i>...'
-    // logDiv.appendChild(p)
+    let p = document.createElement('p')
+    p.style.padding = '2px 5px'
+    p.innerHTML = 'Adding <i>' + comicTitle + '</i>...'
+    logDiv.appendChild(p)
 
-    // console.log(comicId)
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 201) {
+          p.innerHTML = '<i>' + comicTitle + '</i> added to library !'
+        } else {
+          p.innerHTML = '<i>' + comicTitle + '</i> error !!!'
+        }
+      }
+    }
+    xhr.open('POST', 'https://www.marvel.com/my_account/my_must_reads', true)
+
+    let formData = new FormData()
+    formData.append('id', comicId)
+    xhr.send(formData)
   }
-
-    return
-    // let comicsData = [...html.matchAll(/href=".*www\.marvel.com\/comics\/issue\/([0-9]*)/gm)]
-    // console.debug(comicsData);return;
-    // logDiv.innerHTML = ''
-    // logDiv.style.display = 'block'
-    // for (let i = 0; i < comicsData.length; i += 2) {
-    //     if (!comicsData[i][1]) continue
-    //
-    //     let comicsName = comicsData[i][1]
-    //
-    //
-    //
-    //     let xhr = new XMLHttpRequest()
-    //     xhr.onreadystatechange = function() {
-    //         if (xhr.readyState === 4) {
-    //             if (xhr.status === 201) {
-    //                 p.innerHTML = '<i>' + comicsName + '</i> added to library !'
-    //             } else {
-    //                 p.innerHTML = '<i>' + comicsName + '</i> error !!!'
-    //             }
-    //         }
-    //     }
-    //     xhr.open('POST', 'https://www.marvel.com/my_account/my_must_reads', true)
-    //
-    //     let formData = new FormData()
-    //     formData.append('id', comicsData[i][1])
-    //     xhr.send(formData)
-    //     break
-    // }
 }
