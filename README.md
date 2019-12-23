@@ -1,28 +1,20 @@
-## Add comics series to your library
-```
-GET https://www.marvel.com/comics/show_more
-```
-Parameters :
-  * `tpl: ../partials/comic_issue/comics_singlerow_item.mtpl` Mandatory !
-  * `orderBy: release date+asc`
-  * `isDigital: 1` To get only Marvel Unlimited comics
-  * `offset: 0`
-  * `byType: comic_series` 
-  * `byId: 466` Id of the comic serie
-  * `limit: 18`
-  * `count: 20`
+# Marvel Unlimited - Add series
+`Marvel Unlimited - Add series` is a Google Chrome and Brave extension (soon on Firefox) that add a button on Marvel series pages who allow you to add the whole series (only issues available with Marvel Unlimited) to your Marvel Unlimited library.
 
-It return HTML code with link to comics, here is the regex to get comics IDs
-`www\.marvel\.com\/comics\/issue\/([0-9]*)`
+You must be subscribed to Marvel Unlimited.
+## How does it work
+First we fetch the list of issues from this URL `https://www.marvel.com/comics/show_more` with these parameters :
+ * `offset=0`
+ * `tpl=..%2Fpartials%2Fcomic_issue%2Fcomics_singlerow_item.mtpl` Mandatory !
+ * `byType=comic_series` Needed to filter by comic series ID
+ * `limit=100`
+ * `isDigital=1` Only get Marvel Unlimited
+ * `byId=1` Comic series' ID
 
-### Add to library
-```
-POST https://www.marvel.com/my_account/my_must_reads
-````
-Parameters :
-  * `ID` Comic's ID extracted from regex
-  
-### Remove from library
-```
-DELETE /my_account/my_must_reads/issues/:comic_id
-```
+It return HTML that we parse to get IDs of comic issues.
+Then with those IDs we send a POST request to `https://www.marvel.com/my_account/my_must_reads` with these parameters:
+ * `ID` Comic issue ID
+
+And BOOM, it's added to your library
+
+PS: If someone want to correct my english, please do it :)
