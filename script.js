@@ -17,10 +17,27 @@ logDiv.style.background = '#e62429'
 logDiv.style.color = '#FFF'
 logDiv.style.display = 'none'
 
+// Create progress bar
+const progressBarContainer = document.createElement('div')
+progressBarContainer.style.width = '100%'
+progressBarContainer.style.height = '20px'
+progressBarContainer.style.background = '#fff'
+progressBarContainer.style.display = 'none'
+progressBarContainer.style.margin = '20px 0'
+
+const progressBar = document.createElement('div')
+progressBar.style.background = '#e62429'
+progressBar.style.width = '0'
+progressBar.style.height = '100%'
+progressBar.style.transition = 'width .1s'
+progressBar.style.textAlign = 'center'
+progressBarContainer.appendChild(progressBar)
+
 // Display button and logDiv
 const buttonParentNode = document.querySelector('.module .featured-item-info-wrap .featured-item-text')
 if (buttonParentNode) {
   buttonParentNode.appendChild(addToLibraryButton)
+  buttonParentNode.appendChild(progressBarContainer)
   buttonParentNode.appendChild(logDiv)
 }
 
@@ -75,6 +92,9 @@ xhr.send()
 const registerAddEvent = function () {
   addToLibraryButton.addEventListener('click', function (e) {
     e.preventDefault()
+
+    addToLibraryButtonInside.innerText = 'Fetching all issues...'
+
     let xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
@@ -101,14 +121,17 @@ const registerAddEvent = function () {
 }
 
 const addToLibrary = function(html) {
-  const idRegex = /www\.marvel.com\/comics\/issue\/([0-9]*)/g
+  const idRegex = /www\.marvel.com\/comics\/issue\/([0-9]*)/
   const nameRegex = ''
+  let done = 0
 
   const mainDocument = document.createElement('div')
   mainDocument.innerHTML = html
 
   logDiv.innerHTML = ''
   logDiv.style.display = 'block'
+  progressBar.style.width = '0'
+  progressBarContainer.style.display = 'block'
 
   let comicIssues = mainDocument.getElementsByClassName('row-item-image')
   for (let i = 0; i < comicIssues.length; i++) {
@@ -130,6 +153,8 @@ const addToLibrary = function(html) {
     let xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
+        progressBar.style.width = (100 * ++done) / comicIssues.length + '%'
+        progressBar.innerText = done + '/' + comicIssues.length
         if (xhr.status === 201) {
           p.innerHTML = '<i>' + comicTitle + '</i> added to library !'
         } else {
@@ -143,4 +168,5 @@ const addToLibrary = function(html) {
     formData.append('id', comicId)
     xhr.send(formData)
   }
+  addToLibraryButtonInside.innerText = 'Add ' + comicsNumber + ' issue' + (comicsNumber > 0 ? 's' : '') + ' to Library'
 }
