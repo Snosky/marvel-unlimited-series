@@ -1,5 +1,5 @@
-# Marvel Unlimited - Add series
-`Marvel Unlimited - Add series` is a Google Chrome and Brave extension (soon on Firefox) that add a button on Marvel series pages who allow you to add the whole series (only issues available with Marvel Unlimited) to your Marvel Unlimited library.
+# Marvel Unlimited Series
+`Marvel Unlimited Series` is a Google Chrome and Brave extension (soon on Firefox) that add a button on Marvel series pages who allow you to add the whole series (only issues available with Marvel Unlimited) to your Marvel Unlimited library.
 
 You must be subscribed to Marvel Unlimited.
 ## How does it work
