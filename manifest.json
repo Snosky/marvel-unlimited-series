@@ -1,7 +1,13 @@
 {
   "name": "Marvel Unlimited Series",
+  "short_name": "MUS",
   "version": "1.0",
-  "description": "Add a button to add a series of comics book to your library",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "description": "Add a button on comic series' page from marvel.com, to allow you to add the whole series to your Marvel Unlimited library",
   "manifest_version": 2,
   "permissions": [
     "activeTab",
