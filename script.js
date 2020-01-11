@@ -11,8 +11,11 @@ addToLibraryButton.appendChild(addToLibraryButtonInside)
 
 let advancedErrorLog = ''
 // Create copy logs button
-const copyAdvancedErrorLog = document.createElement('a')
-copyAdvancedErrorLog.innerText = 'Copy advanced error logs'
+const copyAdvancedErrorLog = document.createElement('p')
+copyAdvancedErrorLog.innerText = 'Copy advanced logs'
+copyAdvancedErrorLog.style.color = 'white'
+copyAdvancedErrorLog.style.cursor = 'pointer'
+
 copyAdvancedErrorLog.addEventListener('click', function(e){
   e.preventDefault()
   navigator.clipboard.writeText(advancedErrorLog)
@@ -175,13 +178,13 @@ const addToLibrary = function(html) {
         progressBar.innerText = done + '/' + comicIssues.length
         if (xhr.status === 201) {
           p.innerHTML = '<i>' + comicTitle + '</i> added to library !'
+          advancedErrorLog += 'Comic ID : ' + comicId + ' - Successfully added\n'
         } else {
           p.innerHTML = '<i>' + comicTitle + '</i> error !'
-          advancedErrorLog += 'Comic ID : ' + comicId + ' - XHR Code ' + xhr.status + (xhr.status !== 400 ? 'XHR Response : ' + xhr.response : '') + '<br>'
-          if (!showAdvancedErrorButton) {
-            showAdvancedErrorButton = true
-            buttonParentNode.append(copyAdvancedErrorLog)
-          }
+          advancedErrorLog += 'Comic ID : ' + comicId + ' - XHR Code ' + xhr.status + (xhr.status !== 400 ? 'XHR Response : ' + xhr.response : '') + '\n'
+        }
+        if (done >= comicIssues.length) {
+          buttonParentNode.append(copyAdvancedErrorLog)
         }
       }
     }
