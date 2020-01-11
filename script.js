@@ -9,6 +9,25 @@ addToLibraryButtonInside.innerText = 'Loading...'
 
 addToLibraryButton.appendChild(addToLibraryButtonInside)
 
+let advancedErrorLog = ''
+// Create copy logs button
+const copyAdvancedErrorLog = document.createElement('p')
+copyAdvancedErrorLog.innerText = 'Copy advanced logs'
+copyAdvancedErrorLog.style.color = 'white'
+copyAdvancedErrorLog.style.cursor = 'pointer'
+
+copyAdvancedErrorLog.addEventListener('click', function(e){
+  e.preventDefault()
+  navigator.clipboard.writeText(advancedErrorLog)
+    .then(() => {
+      copyAdvancedErrorLog.innerText = 'Copied to clipboard'
+    })
+    .catch((err) => {
+      console.error('Failed to copy error', err)
+      copyAdvancedErrorLog.innerText = 'An error occured.'
+    })
+})
+
 // Create log div
 const logDiv = document.createElement('div')
 logDiv.style.height = '200px'
@@ -50,7 +69,7 @@ if (!serieId) {
 
 let loggedIn = false
 if (!sessionStorage.getItem('marvelUserData')) {
-  addToLibraryButtonInside.innerText = 'ERROR : Session marvelUserData not found'
+  addToLibraryButtonInside.innerText = 'ERROR : Session marvelUserData not found. Please connect to your account.'
   throw new Error('Session marvelUserData not found.')
 }
 
@@ -124,10 +143,12 @@ const addToLibrary = function(html) {
   const idRegex = /www\.marvel.com\/comics\/issue\/([0-9]*)/
   const nameRegex = ''
   let done = 0
+  let showAdvancedErrorButton = false
 
   const mainDocument = document.createElement('div')
   mainDocument.innerHTML = html
 
+  advancedErrorLog = ''
   logDiv.innerHTML = ''
   logDiv.style.display = 'block'
   progressBar.style.width = '0'
@@ -157,8 +178,13 @@ const addToLibrary = function(html) {
         progressBar.innerText = done + '/' + comicIssues.length
         if (xhr.status === 201) {
           p.innerHTML = '<i>' + comicTitle + '</i> added to library !'
+          advancedErrorLog += 'Comic ID : ' + comicId + ' - Successfully added\n'
         } else {
-          p.innerHTML = '<i>' + comicTitle + '</i> error !!!'
+          p.innerHTML = '<i>' + comicTitle + '</i> error !'
+          advancedErrorLog += 'Comic ID : ' + comicId + ' - XHR Code ' + xhr.status + (xhr.status !== 400 ? 'XHR Response : ' + xhr.response : '') + '\n'
+        }
+        if (done >= comicIssues.length) {
+          buttonParentNode.append(copyAdvancedErrorLog)
         }
       }
     }
