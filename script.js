@@ -69,7 +69,7 @@ if (!serieId) {
 
 let loggedIn = false
 if (!sessionStorage.getItem('marvelUserData')) {
-  addToLibraryButtonInside.innerText = 'ERROR : Session marvelUserData not found'
+  addToLibraryButtonInside.innerText = 'ERROR : Session marvelUserData not found. Please connect to your account.'
   throw new Error('Session marvelUserData not found.')
 }
 
