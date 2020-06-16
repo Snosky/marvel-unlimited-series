@@ -18,3 +18,11 @@ Then with those IDs we send a POST request to `https://www.marvel.com/my_account
 And BOOM, it's added to your library
 
 PS: If someone want to correct my english, please do it :)
+
+
+## Build
+For Chrome
+```npm run build:chrome```
+
+For Firefox
+```npm run build:firefox```
