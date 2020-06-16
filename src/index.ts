@@ -63,6 +63,13 @@ declare const process : {
         progressBar.appendTo(buttonParentNode);
         simpleLogger.appendTo(buttonParentNode);
 
+        simpleLogger.addLog('Thank you for using Marvel Unlimited Series.')
+        if (process.env.RATE_URL) {
+            simpleLogger.addLog(`If you want to support me, <a href="${process.env.RATE_URL}" target="_blank">please rate MUS !</a>`)
+        }
+        simpleLogger.addLog('Bug or Idea ? Submit it on <a href="https://github.com/Snosky/marvel-unlimited-series" target="_blank">GitHub</a>.')
+        simpleLogger.addLog('---')
+
         series.addToLibrary(
             (comic) => {
                 simpleLogger.addLog(comic.title + ' ...', comic.id);
@@ -76,11 +83,6 @@ declare const process : {
             (comic: MarvelComic) => {
                 progressBar.addProgress();
                 if (progressBar.isFinished) {
-                    simpleLogger.addLog('---')
-                    simpleLogger.addLog('Thank you for using Marvel Unlimited Series.')
-                    if (process.env.RATE_URL)
-                        simpleLogger.addLog(`If you want to support me, <a href="${process.env.RATE_URL}" target="_blank">please rate MUS !</a>`)
-                    simpleLogger.addLog('Bug or Idea ? Submit it on <a href="https://github.com/Snosky/marvel-unlimited-series" target="_blank">GitHub</a>.')
                     advancedLogger.appendButtonTo(buttonParentNode);
                 }
             }
