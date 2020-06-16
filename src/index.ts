@@ -5,6 +5,12 @@ import MarvelComic from "./MarvelComic";
 import SimpleLogger from "./SimpleLogger";
 import AdvancedLogger from "./AdvancedLogger";
 
+declare const process : {
+    env: {
+        RATE_URL: string;
+    }
+}
+
 (async function(){
     const addToLibraryButton = new AddToLibraryButton();
     addToLibraryButton.toggleLoading();
@@ -22,7 +28,7 @@ import AdvancedLogger from "./AdvancedLogger";
 
     let loggedIn = false;
     if (!sessionStorage.getItem('marvelUserData')) {
-        addToLibraryButton.setErrorText('Session marvelUserData not found. Please connect to your account.');
+        addToLibraryButton.setErrorText('Please connect to your account.');
         throw new Error('Session marvelUserData not found.')
     }
 
@@ -72,7 +78,8 @@ import AdvancedLogger from "./AdvancedLogger";
                 if (progressBar.isFinished) {
                     simpleLogger.addLog('---')
                     simpleLogger.addLog('Thank you for using Marvel Unlimited Series.')
-                    simpleLogger.addLog('If you want to support me, <a href="https://chrome.google.com/webstore/detail/marvel-unlimited-series/onoekiemmcckeimlfhenofalncmkedbg" target="_blank">please rate MUS !</a>')
+                    if (process.env.RATE_URL)
+                        simpleLogger.addLog(`If you want to support me, <a href="${process.env.RATE_URL}" target="_blank">please rate MUS !</a>`)
                     simpleLogger.addLog('Bug or Idea ? Submit it on <a href="https://github.com/Snosky/marvel-unlimited-series" target="_blank">GitHub</a>.')
                     advancedLogger.appendButtonTo(buttonParentNode);
                 }
