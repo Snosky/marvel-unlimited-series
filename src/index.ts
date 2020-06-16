@@ -42,7 +42,8 @@ import AdvancedLogger from "./AdvancedLogger";
         addToLibraryButton.setErrorText(' Failed parsing JSON.');
         throw new Error('Failed parsing JSON on series init');
     }
-    if (series.getComicNb()) {
+
+    if (!series.getComicNb()) {
         addToLibraryButton.setCustomText('No Marvel Unlimited comics in this series.');
         return;
     } else {
