@@ -57,7 +57,7 @@ export default class MarvelComic {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://www.marvel.com/my_account/my_must_reads', true);
             xhr.onreadystatechange = () => {
-                if (xhr.status === 201) {
+                if (xhr.status === 200) {
                     return resolve(xhr.response);
                 } else {
                     AdvancedLogger.addLog('ERROR - Comic #' + this.id + ' - XHR Status : ' + xhr.status + ' - XHR Response : \n ' + xhr.responseText + '\n ---');
