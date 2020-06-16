@@ -22,7 +22,7 @@ export default class SimpleLogger {
 
     public addLog(str: string, id?: number) {
         if (!id) {
-            this.lastId++;
+            id = this.lastId++;
         }
         if (!this.logNodes[id]) {
             this.logNodes[id] =  document.createElement('p');
