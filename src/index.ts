@@ -70,6 +70,10 @@ import AdvancedLogger from "./AdvancedLogger";
             (comic: MarvelComic) => {
                 progressBar.addProgress();
                 if (progressBar.isFinished) {
+                    simpleLogger.addLog('---')
+                    simpleLogger.addLog('Thank you for using Marvel Unlimited Series.')
+                    simpleLogger.addLog('If you want to support me, <a href="https://chrome.google.com/webstore/detail/marvel-unlimited-series/onoekiemmcckeimlfhenofalncmkedbg" target="_blank">please rate MUS !</a>')
+                    simpleLogger.addLog('Bug or Idea ? Submit it on <a href="https://github.com/Snosky/marvel-unlimited-series" target="_blank">GitHub</a>.')
                     advancedLogger.appendButtonTo(buttonParentNode);
                 }
             }
