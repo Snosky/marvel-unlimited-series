@@ -6,11 +6,11 @@ const ZipPlugin = require('zip-webpack-plugin');
 module.exports = env => {
     return {
         entry: {
-            'script.js': './src/index.ts'
+            script: './src/index.ts'
         },
         output: {
             path: path.resolve(__dirname, 'dist'),
-            filename: 'script.js'
+            filename: '[name].js'
         },
         module: {
             rules: [
@@ -33,6 +33,8 @@ module.exports = env => {
             new CopyPlugin([
                 {from: './icons/*', to: '[name].[ext]'},
                 {from: './manifest.json', to: 'manifest.json', toType: 'file'},
+                {from: './popup.html', to: 'popup.html', toType: 'file'},
+                {from: './background.js', to: 'background.js', toType: 'file'},
             ]),
             new ZipPlugin({
                 path: 'zip',

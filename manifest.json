@@ -12,12 +12,19 @@
   "permissions": [
     "activeTab",
     "https://www.marvel.com/",
-    "storage"
+    "storage",
+    "declarativeContent"
   ],
-  "content_scripts": [{
-    "js": ["script.js"],
-    "matches": [
-      "https://www.marvel.com/comics/series/*"
-    ]
-  }]
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "page_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  }
 }
