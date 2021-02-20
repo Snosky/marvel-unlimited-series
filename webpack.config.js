@@ -12,14 +12,20 @@ module.exports = env => {
             path: path.resolve(__dirname, 'dist'),
             filename: 'script.js'
         },
+        mode: 'development',
         module: {
             rules: [
                 {
                     test: /\.ts$/,
                     use: 'ts-loader',
                     exclude: /node_modules/,
+                },
+                {
+                    test: /\.html$/i,
+                    loader: 'html-loader',
+                    exclude: /node_modules/
                 }
-            ]
+            ],
         },
         resolve: {
             extensions: ['.ts']
@@ -30,10 +36,12 @@ module.exports = env => {
                     'RATE_URL': JSON.stringify(env.RATE_URL)
                 }
             }),
-            new CopyPlugin([
-                {from: './icons/*', to: '[name].[ext]'},
-                {from: './manifest.json', to: 'manifest.json', toType: 'file'},
-            ]),
+            new CopyPlugin({
+                patterns: [
+                    {from: './icons/*', to: '[name].[ext]'},
+                    {from: './manifest.json', to: 'manifest.json', toType: 'file'},
+                ]
+            }),
             new ZipPlugin({
                 path: 'zip',
                 filename: env.BROWSER + '.zip',
