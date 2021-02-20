@@ -59,9 +59,12 @@ export default class MarvelComic {
         return new Promise((resolve, reject) => {
             fetch('https://www.marvel.com/my_account/my_must_reads', { method: "POST", body: formData })
                 .then(response => {
-                    if (response.status === 200) return resolve()
+                    if (response.status === 200) {
+                        AdvancedLogger.success(`[AddToLibrary][${this.id}] Added comic to library`)
+                        return resolve()
+                    }
                     return response.text().then((text) => {
-                        AdvancedLogger.error(`[AddToLibrary][${this.id}] Failed to add comics to library\nXHR Status ${response.status}\n${text}\n`)
+                        AdvancedLogger.error(`[AddToLibrary][${this.id}] Failed to add comic to library\nXHR Status ${response.status}\n${text}\n`)
                         reject()
                     })
                 })
@@ -72,7 +75,10 @@ export default class MarvelComic {
         return new Promise((resolve, reject) => {
             fetch('https://www.marvel.com/my_account/my_must_reads/issues/' + this.id, { method: 'DELETE' })
                 .then(response => {
-                    if (response.status === 204) return resolve()
+                    if (response.status === 204) {
+                        AdvancedLogger.success(`[RemoveFromLibrary][${this.id}] Remove comic to library`)
+                        return resolve()
+                    }
                     return response.text().then((text) => {
                         AdvancedLogger.error(`[RemoveFromLibrary][${this.id}] Failed to remove comic from library\nXHR Status ${response.status}\n${text}\n`)
                         reject()

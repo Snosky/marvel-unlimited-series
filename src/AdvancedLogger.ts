@@ -1,21 +1,13 @@
 export default class AdvancedLogger {
-    protected buttonNode!: HTMLParagraphElement
+    protected static buttonNode: HTMLParagraphElement
     protected static _logs: string = ''
-
-    constructor() {
-        this.buttonNode = document.createElement('p')
-        this.buttonNode.innerText = 'Copy debug logs'
-        this.buttonNode.style.color = 'white'
-        this.buttonNode.style.cursor = 'pointer'
-
-        this.buttonNode.addEventListener('click', (e) => {
-            e.preventDefault()
-            this.copyToClipboard()
-        })
-    }
 
     public static addLog(str: string) {
         this._logs += str + '\n'
+    }
+
+    public static success(str: string) {
+        this._logs += '[SUCCESS]' + str + '\n'
     }
 
     public static error(str: string) {
@@ -26,11 +18,27 @@ export default class AdvancedLogger {
         return this._logs
     }
 
-    public appendButtonTo(node: HTMLElement) {
+    public static reset() {
+        if (this.buttonNode) {
+            this.buttonNode.remove()
+        }
+        this._logs = ''
+    }
+
+    public static appendButtonTo(node: HTMLElement) {
+        this.buttonNode = document.createElement('p')
+        this.buttonNode.innerText = 'Copy debug logs'
+        this.buttonNode.style.fontSize = '.6em'
+        this.buttonNode.style.cursor = 'pointer'
+
+        this.buttonNode.addEventListener('click', (e) => {
+            e.preventDefault()
+            this.copyToClipboard()
+        })
         node.appendChild(this.buttonNode)
     }
 
-    public copyToClipboard() {
+    public static copyToClipboard() {
         navigator.clipboard.writeText(AdvancedLogger.logs)
             .then(() => {
                 this.buttonNode.innerText = 'Copied to clipboard'

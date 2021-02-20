@@ -5,6 +5,7 @@ import ProgressBar from "./ProgressBar"
 import SimpleLogger from "./SimpleLogger"
 import IssueCollection from "./IssueCollection"
 import RemoveFromLibraryButton from "./RemoveFromLibraryButton"
+import AdvancedLogger from "./AdvancedLogger";
 
 declare const process : {
     env: {
@@ -63,6 +64,7 @@ declare const process : {
     addToLibraryButton.onClick(() => {
         progressBar.appendTo(buttonParentNode).resetProgress()
         simpleLogger.appendTo(buttonParentNode).reset()
+        AdvancedLogger.reset()
 
         addToLibraryButton.disable()
         removeFromLibraryButton.disable()
@@ -76,6 +78,7 @@ declare const process : {
                 if (progressBar.isFinished) {
                     addToLibraryButton.enable()
                     removeFromLibraryButton.enable()
+                    AdvancedLogger.appendButtonTo(buttonParentNode)
                 }
             }
         )
@@ -84,6 +87,7 @@ declare const process : {
     removeFromLibraryButton.onClick(() => {
         progressBar.appendTo(buttonParentNode).resetProgress()
         simpleLogger.appendTo(buttonParentNode).reset()
+        AdvancedLogger.reset()
 
         addToLibraryButton.disable()
         removeFromLibraryButton.disable()
@@ -97,6 +101,7 @@ declare const process : {
                 if (progressBar.isFinished) {
                     addToLibraryButton.enable()
                     removeFromLibraryButton.enable()
+                    AdvancedLogger.appendButtonTo(buttonParentNode)
                 }
             }
         )
