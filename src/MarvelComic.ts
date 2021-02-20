@@ -56,7 +56,7 @@ export default class MarvelComic {
         const formData = new FormData()
         formData.append('id', this._id.toString())
 
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             fetch('https://www.marvel.com/my_account/my_must_reads', { method: "POST", body: formData })
                 .then(response => {
                     if (response.status === 200) {
@@ -72,7 +72,7 @@ export default class MarvelComic {
     }
 
     public removeFromLibrary() {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             fetch('https://www.marvel.com/my_account/my_must_reads/issues/' + this.id, { method: 'DELETE' })
                 .then(response => {
                     if (response.status === 204) {
