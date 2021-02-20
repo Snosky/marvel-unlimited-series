@@ -1,91 +1,104 @@
-import AddToLibraryButton from "./AddToLibraryButton";
-import MarvelSeries from "./MarvelSeries";
-import ProgressBar from "./ProgressBar";
-import MarvelComic from "./MarvelComic";
-import SimpleLogger from "./SimpleLogger";
-import AdvancedLogger from "./AdvancedLogger";
+import AddToLibraryButton from "./AddToLibraryButton"
+import MarvelSeries from "./MarvelSeries"
+import MarvelEvents from "./MarvelEvents"
+import ProgressBar from "./ProgressBar"
+import SimpleLogger from "./SimpleLogger"
+import IssueCollection from "./IssueCollection"
+import RemoveFromLibraryButton from "./RemoveFromLibraryButton"
 
 declare const process : {
     env: {
-        RATE_URL: string;
+        RATE_URL: string
     }
 }
 
-(async function(){
-    const addToLibraryButton = new AddToLibraryButton();
-    addToLibraryButton.toggleLoading();
+(async function() {
+    const addToLibraryButton = new AddToLibraryButton()
+    const removeFromLibraryButton = new RemoveFromLibraryButton()
+    let loggedIn = false
 
-    const buttonParentNode = document.querySelector('.module .featured-item-info-wrap .featured-item-text') as HTMLElement;
-    if (buttonParentNode) {
-        addToLibraryButton.appendTo(buttonParentNode)
+    let issueCollection: IssueCollection
+    let buttonParentNode: HTMLElement
+    if (location.href.match('^.*\/events\/[0-9]+.*$')) {
+        const eventId = parseInt(location.href.match('^.*\/events\/([0-9]+).*$')[1])
+        issueCollection = new MarvelEvents(eventId)
+        buttonParentNode = document.querySelector('#comics-eventsdetail > div.header-box.grid-container > div > div.details-right')
+    } else if (location.href.match('^.*\/series\/[0-9]+.*$')) {
+        const seriesId = parseInt(location.href.match('^.*\/series\/([0-9]+).*$')[1])
+        issueCollection = new MarvelSeries(seriesId)
+        buttonParentNode = document.querySelector('.module .featured-item-info-wrap .featured-item-text') as HTMLElement
     }
 
-    const seriesId = parseInt(location.href.match('^.*series\/([0-9]*).*$')[1]);
-    if (!seriesId) {
-        addToLibraryButton.setErrorText('Series ID not found.');
-        throw new Error('Series ID not found');
-    }
+    addToLibraryButton.appendTo(buttonParentNode)
+    addToLibraryButton.toggleLoading()
 
-    let loggedIn = false;
     if (!sessionStorage.getItem('marvelUserData')) {
-        addToLibraryButton.setErrorText('Please connect to your account.');
+        addToLibraryButton.setErrorText('Please connect to your account.')
         throw new Error('Session marvelUserData not found.')
     }
 
     try {
         loggedIn = JSON.parse(sessionStorage.getItem('marvelUserData')).loggedIn
     } catch (e) {
-        addToLibraryButton.setErrorText('You must be logged in.');
-        throw new Error('mavelUserData\'s parsing failed');
+        addToLibraryButton.setErrorText('You must be logged in.')
+        throw new Error('mavelUserData\'s parsing failed')
     }
     if (!loggedIn) {
-        addToLibraryButton.setErrorText('You must be logged in.');
+        addToLibraryButton.setErrorText('You must be logged in.')
         throw new Error('User not logged in.')
     }
 
-    const series = new MarvelSeries(seriesId);
-    if (!await series.init()) {
-        addToLibraryButton.setErrorText(' Failed parsing JSON.');
-        throw new Error('Failed parsing JSON on series init');
-    }
+    await issueCollection.loadIssues()
 
-    if (!series.getComicNb()) {
-        addToLibraryButton.setCustomText('No Marvel Unlimited comics in this series.');
-        return;
-    } else {
-        addToLibraryButton.setDefaultText(series.getComicNb());
+    if (!issueCollection.comicsCount()) {
+        addToLibraryButton.setCustomText('No Marvel Unlimited comics found.')
+        return
     }
+    addToLibraryButton.setDefaultText(issueCollection.comicsCount())
+    removeFromLibraryButton.appendTo(buttonParentNode)
 
-    const progressBar = new ProgressBar(series.getComicNb());
-    const simpleLogger = new SimpleLogger();
-    const advancedLogger = new AdvancedLogger();
+    const progressBar = new ProgressBar(issueCollection.comicsCount())
+    const simpleLogger = new SimpleLogger(process.env.RATE_URL)
+
     addToLibraryButton.onClick(() => {
-        progressBar.appendTo(buttonParentNode);
-        simpleLogger.appendTo(buttonParentNode);
+        progressBar.appendTo(buttonParentNode).resetProgress()
+        simpleLogger.appendTo(buttonParentNode).reset()
 
-        simpleLogger.addLog('Thank you for using Marvel Unlimited Series.')
-        if (process.env.RATE_URL) {
-            simpleLogger.addLog(`If you want to support me, <a href="${process.env.RATE_URL}" target="_blank">please rate MUS !</a>`)
-        }
-        simpleLogger.addLog('Bug or Idea ? Submit it on <a href="https://github.com/Snosky/marvel-unlimited-series" target="_blank">GitHub</a>.')
-        simpleLogger.addLog('---')
+        addToLibraryButton.disable()
+        removeFromLibraryButton.disable()
 
-        series.addToLibrary(
-            (comic) => {
-                simpleLogger.addLog(comic.title + ' ...', comic.id);
-            },
-            (comic) => {
-                simpleLogger.addLog(comic.title + ' successfully added !', comic.id);
-            },
-            (comic) => {
-                simpleLogger.addLog(comic.title + ' error !!', comic.id);
-            },
-            (comic: MarvelComic) => {
-                progressBar.addProgress();
+        issueCollection.addIssuesToLibrary(
+            comic => simpleLogger.addLog(comic.title + ' ...', comic.id),
+            comic => simpleLogger.addLog(comic.title + ' successfully added !', comic.id),
+            comic => simpleLogger.addLog(comic.title + ' error !!', comic.id),
+            comic => {
+                progressBar.addProgress()
                 if (progressBar.isFinished) {
-                    advancedLogger.appendButtonTo(buttonParentNode);
+                    addToLibraryButton.enable()
+                    removeFromLibraryButton.enable()
                 }
             }
-        );
-    });
+        )
+    })
+
+    removeFromLibraryButton.onClick(() => {
+        progressBar.appendTo(buttonParentNode).resetProgress()
+        simpleLogger.appendTo(buttonParentNode).reset()
+
+        addToLibraryButton.disable()
+        removeFromLibraryButton.disable()
+
+        issueCollection.removeFromLibrary(
+            comic => simpleLogger.addLog(comic.title + ' ...', comic.id),
+            comic => simpleLogger.addLog(comic.title + ' successfully removed !', comic.id),
+            comic => simpleLogger.addLog(comic.title + ' error !!', comic.id),
+            comic => {
+                progressBar.addProgress()
+                if (progressBar.isFinished) {
+                    addToLibraryButton.enable()
+                    removeFromLibraryButton.enable()
+                }
+            }
+        )
+    })
 })();

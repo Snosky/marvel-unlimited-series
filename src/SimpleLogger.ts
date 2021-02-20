@@ -1,23 +1,51 @@
 export default class SimpleLogger {
-    private readonly node!: HTMLDivElement;
-    private logNodes: { [id: number]: HTMLParagraphElement } = {};
-    private lastId: number = 0;
+    protected readonly node!: HTMLDivElement
+    protected logNodes: { [id: number]: HTMLParagraphElement } = {}
+    protected lastId: number = 0
+    protected rateUrl?: string
+    protected displayed = false
 
-    constructor() {
-        this.node = document.createElement('div');
-        this.node.style.height = '200px';
-        this.node.style.overflowY = 'auto';
-        this.node.style.background = '#e62429';
-        this.node.style.color = '#FFF';
+    constructor(rateUrl?: string) {
+        this.node = document.createElement('div')
+        this.node.style.height = '200px'
+        this.node.style.overflowY = 'auto'
+        this.node.style.background = '#e62429'
+        this.node.style.color = '#FFF'
+        this.rateUrl = rateUrl
+        this.addDefaultText()
     }
 
-    public appendTo(node: HTMLElement): void {
-        node.appendChild(this.node);
+    protected addDefaultText() {
+        this.addLog('Thank you for using Marvel Unlimited Series.')
+        if (this.rateUrl) {
+            this.addLog(`If you want to support me, <a href="${this.rateUrl}" style="color: white; text-decoration: underline" target="_blank">please rate MUS !</a>`)
+        }
+        this.addLog('Bug or Idea ? Submit it on <a href="https://github.com/Snosky/marvel-unlimited-series" style="color: white; text-decoration: underline" target="_blank">GitHub</a>.')
+        this.addLog('---')
     }
 
-    public reset() {
-        this.logNodes = {};
-        this.node.innerHTML = '';
+    public appendTo(node: HTMLElement): SimpleLogger {
+        if (!this.displayed) {
+            node.appendChild(this.node)
+            this.displayed = true
+        }
+        return this
+    }
+
+    public reset(defaultText = true): SimpleLogger{
+        this.logNodes = {}
+        this.node.innerHTML = ''
+        if (defaultText) {
+            this.addDefaultText()
+        }
+        return this
+    }
+
+    public destroy(): SimpleLogger {
+        this.displayed = false
+        this.node.remove()
+        this.reset(false)
+        return this
     }
 
     public addLog(str: string, id?: number) {
