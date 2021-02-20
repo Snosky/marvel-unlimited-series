@@ -4,8 +4,8 @@
   "description": "`Marvel Unlimited Series` is a Google Chrome and Brave extension (soon on Firefox) that add a button on Marvel series pages who allow you to add the whole series (only issues available with Marvel Unlimited) to your Marvel Unlimited library.",
   "scripts": {
     "watch": "npm-watch",
-    "build:chrome": "webpack --env.BROWSER=chrome --env.RATE_URL='https://chrome.google.com/webstore/detail/marvel-unlimited-series/onoekiemmcckeimlfhenofalncmkedbg'",
-    "build:firefox": "webpack --env.BROWSER=firefox"
+    "build:chrome": "webpack --env BROWSER=chrome --env RATE_URL='https://chrome.google.com/webstore/detail/marvel-unlimited-series/onoekiemmcckeimlfhenofalncmkedbg'",
+    "build:firefox": "webpack --env BROWSER=firefox"
   },
   "repository": {
     "type": "git",
@@ -18,17 +18,21 @@
   },
   "homepage": "https://github.com/Snosky/marvel-unlimited-series#readme",
   "devDependencies": {
-    "copy-webpack-plugin": "^5.1.1",
-    "ts-loader": "^6.2.1",
-    "typescript": "^3.7.4",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
-    "zip-webpack-plugin": "^3.0.0"
+    "copy-webpack-plugin": "^7.0.0",
+    "html-loader": "^2.1.0",
+    "npm-watch": "^0.7.0",
+    "ts-loader": "^8.0.17",
+    "typescript": "^4.1.5",
+    "webpack": "^5.23.0",
+    "webpack-cli": "^4.5.0",
+    "zip-webpack-plugin": "^4.0.1"
   },
   "watch": {
     "build:chrome": {
-      "patterns" : ["src"],
-      "extensions": "ts"
+      "patterns": [
+        "src"
+      ],
+      "extensions": ["ts", "html"]
     }
   }
 }
