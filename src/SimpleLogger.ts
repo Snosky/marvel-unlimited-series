@@ -5,16 +5,26 @@ export default class SimpleLogger {
     protected rateUrl?: string
     protected displayed = false
 
-    constructor(rateUrl?: string) {
-        this.node = document.createElement('div')
-        this.node.style.height = '200px'
-        this.node.style.overflowY = 'auto'
-        this.node.style.background = '#e62429'
-        this.node.style.color = '#FFF'
+    constructor(template: HTMLElement, rateUrl?: string) {
+        this.node = template.querySelector('#mus-simpleLogger')
         this.rateUrl = rateUrl
         this.addDefaultText()
     }
 
+    public show() {
+        this.node.style.display = 'block'
+        return this
+    }
+
+    public hide() {
+        this.node.style.display = 'none'
+        return this
+    }
+
+    /**
+     * Add default messages
+     * @protected
+     */
     protected addDefaultText() {
         this.addLog('Thank you for using Marvel Unlimited Series.')
         if (this.rateUrl) {
@@ -24,14 +34,10 @@ export default class SimpleLogger {
         this.addLog('---')
     }
 
-    public appendTo(node: HTMLElement): SimpleLogger {
-        if (!this.displayed) {
-            node.appendChild(this.node)
-            this.displayed = true
-        }
-        return this
-    }
-
+    /**
+     * Delete all logs
+     * @param defaultText
+     */
     public reset(defaultText = true): SimpleLogger{
         this.logNodes = {}
         this.node.innerHTML = ''
@@ -41,20 +47,18 @@ export default class SimpleLogger {
         return this
     }
 
-    public destroy(): SimpleLogger {
-        this.displayed = false
-        this.node.remove()
-        this.reset(false)
-        return this
-    }
-
+    /**
+     * Add a log
+     * @param str
+     * @param id
+     */
     public addLog(str: string, id?: number) {
         if (!id) {
             id = this.lastId++;
         }
         if (!this.logNodes[id]) {
-            this.logNodes[id] =  document.createElement('p');
-            this.logNodes[id].style.padding = '2px 5px';
+            this.logNodes[id] = document.createElement('p');
+            this.logNodes[id].classList.add('mus-simpleLog')
             this.node.appendChild(this.logNodes[id]);
         }
         this.logNodes[id].innerHTML = str;

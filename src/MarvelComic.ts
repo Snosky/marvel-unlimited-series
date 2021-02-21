@@ -1,5 +1,3 @@
-import AdvancedLogger from "./AdvancedLogger"
-
 export default class MarvelComic {
     protected _id!: number
     protected _title!: string
@@ -59,14 +57,8 @@ export default class MarvelComic {
         return new Promise<void>((resolve, reject) => {
             fetch('https://www.marvel.com/my_account/my_must_reads', { method: "POST", body: formData })
                 .then(response => {
-                    if (response.status === 200) {
-                        AdvancedLogger.success(`[AddToLibrary][${this.id}] Added comic to library`)
-                        return resolve()
-                    }
-                    return response.text().then((text) => {
-                        AdvancedLogger.error(`[AddToLibrary][${this.id}] Failed to add comic to library\nXHR Status ${response.status}\n${text}\n`)
-                        reject()
-                    })
+                    if (response.status === 200) return resolve()
+                    return response.text().then((text) => reject())
                 })
         })
     }
@@ -75,14 +67,8 @@ export default class MarvelComic {
         return new Promise<void>((resolve, reject) => {
             fetch('https://www.marvel.com/my_account/my_must_reads/issues/' + this.id, { method: 'DELETE' })
                 .then(response => {
-                    if (response.status === 204) {
-                        AdvancedLogger.success(`[RemoveFromLibrary][${this.id}] Remove comic to library`)
-                        return resolve()
-                    }
-                    return response.text().then((text) => {
-                        AdvancedLogger.error(`[RemoveFromLibrary][${this.id}] Failed to remove comic from library\nXHR Status ${response.status}\n${text}\n`)
-                        reject()
-                    })
+                    if (response.status === 204) return resolve()
+                    return response.text().then((text) => reject())
                 })
         })
     }

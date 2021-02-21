@@ -1,109 +1,128 @@
-import AddToLibraryButton from "./AddToLibraryButton"
-import MarvelSeries from "./MarvelSeries"
-import MarvelEvents from "./MarvelEvents"
-import ProgressBar from "./ProgressBar"
-import SimpleLogger from "./SimpleLogger"
-import IssueCollection from "./IssueCollection"
-import RemoveFromLibraryButton from "./RemoveFromLibraryButton"
-import AdvancedLogger from "./AdvancedLogger";
+import templateHtml from './template.html'
+import AddToLibraryButton from './AddToLibraryButton'
+import MarvelComicCollection from './MarvelComicCollection'
+import Parameters, {AvailableParameter} from './Parameters'
+import ProgressBar from './ProgressBar'
+import SimpleLogger from './SimpleLogger'
+import RemoveFromLibraryButton from './RemoveFromLibraryButton'
 
-declare const process : {
-    env: {
-        RATE_URL: string
-    }
+enum PageType {
+    'events' = 'events',
+    'series' = 'series'
+}
+let match: RegExpMatchArray
+let pageType: PageType
+if ((match = location.href.match('^.*\/events\/([0-9]+).*$'))) {
+    pageType = PageType.events
+} else if ((match = location.href.match('^.*\/series\/([0-9]+).*$'))) {
+    pageType = PageType.series
 }
 
-(async function() {
-    const addToLibraryButton = new AddToLibraryButton()
-    const removeFromLibraryButton = new RemoveFromLibraryButton()
-    let loggedIn = false
+if (!pageType) {
+    throw '[MUS]No page type found'
+}
 
-    let issueCollection: IssueCollection
-    let buttonParentNode: HTMLElement
-    if (location.href.match('^.*\/events\/[0-9]+.*$')) {
-        const eventId = parseInt(location.href.match('^.*\/events\/([0-9]+).*$')[1])
-        issueCollection = new MarvelEvents(eventId)
-        buttonParentNode = document.querySelector('#comics-eventsdetail > div.header-box.grid-container > div > div.details-right')
-    } else if (location.href.match('^.*\/series\/[0-9]+.*$')) {
-        const seriesId = parseInt(location.href.match('^.*\/series\/([0-9]+).*$')[1])
-        issueCollection = new MarvelSeries(seriesId)
-        buttonParentNode = document.querySelector('.module .featured-item-info-wrap .featured-item-text') as HTMLElement
+let id = parseInt(match[1])
+
+/** Set template **/
+const template = document.createElement('div')
+template.innerHTML = templateHtml
+const parentNode = document.querySelector(pageType === PageType.events
+        ? '#comics-eventsdetail > div.header-box.grid-container > div > div.details-right'
+        : '.module .featured-item-info-wrap .featured-item-text'
+    )
+parentNode.append(template)
+
+const addToLibraryButton = new AddToLibraryButton(template)
+const removeFromLibraryButton = new RemoveFromLibraryButton(template)
+const parameters = new Parameters(template)
+const simpleLogger = new SimpleLogger(template)
+const progressBar = new ProgressBar(template)
+let marvelCollection: MarvelComicCollection|undefined
+
+function onParameterChange() {
+    addToLibraryButton.loading().disable()
+    simpleLogger.reset().hide()
+    progressBar.reset().hide()
+    parameters.disable()
+
+    const promise = pageType === PageType.events
+        ? MarvelComicCollection.buildFromMarvelEvent(id, parameters.get(AvailableParameter.includeTieInIssues) as boolean)
+        : MarvelComicCollection.buildFromMarvelSeries(id)
+
+    return promise.then((collection) => {
+        marvelCollection = collection
+        addToLibraryButton.addToLibrary(marvelCollection.count()).enable()
+        parameters.enable()
+    })
+}
+
+/** Check if user logged in **/
+try {
+    const marvelUserData = sessionStorage.getItem('marvelUserData')
+    const marvelUserDataJson = JSON.parse(marvelUserData)
+    if (!marvelUserDataJson.loggedIn) {
+        throw 'User not logged in'
     }
+} catch (e) {
+    addToLibraryButton.setText('You must be logged in')
+    console.error('[MUS]', e)
+    throw e
+}
 
-    addToLibraryButton.appendTo(buttonParentNode)
-    addToLibraryButton.toggleLoading()
+parameters.onChange((parameter, value) => {
+    parameters.disable()
+    onParameterChange().then(() => {
+        parameters.enable()
+        console.log('MUS parameters updated')
+    })
+})
 
-    if (!sessionStorage.getItem('marvelUserData')) {
-        addToLibraryButton.setErrorText('Please connect to your account.')
-        throw new Error('Session marvelUserData not found.')
-    }
-
-    try {
-        loggedIn = JSON.parse(sessionStorage.getItem('marvelUserData')).loggedIn
-    } catch (e) {
-        addToLibraryButton.setErrorText('You must be logged in.')
-        throw new Error('mavelUserData\'s parsing failed')
-    }
-    if (!loggedIn) {
-        addToLibraryButton.setErrorText('You must be logged in.')
-        throw new Error('User not logged in.')
-    }
-
-    await issueCollection.loadIssues()
-
-    if (!issueCollection.comicsCount()) {
-        addToLibraryButton.setCustomText('No Marvel Unlimited comics found.')
-        return
-    }
-    addToLibraryButton.setDefaultText(issueCollection.comicsCount())
-    removeFromLibraryButton.appendTo(buttonParentNode)
-
-    const progressBar = new ProgressBar(issueCollection.comicsCount())
-    const simpleLogger = new SimpleLogger(process.env.RATE_URL)
-
-    addToLibraryButton.onClick(() => {
-        progressBar.appendTo(buttonParentNode).resetProgress()
-        simpleLogger.appendTo(buttonParentNode).reset()
-        AdvancedLogger.reset()
-
+addToLibraryButton.onClick(() => {
+    if (marvelCollection && marvelCollection.count()) {
         addToLibraryButton.disable()
-        removeFromLibraryButton.disable()
+        parameters.disable()
 
-        issueCollection.addIssuesToLibrary(
+        progressBar.reset().show().max(marvelCollection.count())
+        simpleLogger.reset().show()
+
+        marvelCollection.addToLibrary(
             comic => simpleLogger.addLog(comic.title + ' ...', comic.id),
             comic => simpleLogger.addLog(comic.title + ' successfully added !', comic.id),
             comic => simpleLogger.addLog(comic.title + ' error !!', comic.id),
-            comic => {
-                progressBar.addProgress()
-                if (progressBar.isFinished) {
-                    addToLibraryButton.enable()
-                    removeFromLibraryButton.enable()
-                    AdvancedLogger.appendButtonTo(buttonParentNode)
-                }
-            }
-        )
-    })
+            comic => progressBar.addProgress()
+        ).then(() => {
+            addToLibraryButton.enable()
+            parameters.enable()
+        })
+    }
+})
 
-    removeFromLibraryButton.onClick(() => {
-        progressBar.appendTo(buttonParentNode).resetProgress()
-        simpleLogger.appendTo(buttonParentNode).reset()
-        AdvancedLogger.reset()
-
+removeFromLibraryButton.onClick(() => {
+    if (marvelCollection && marvelCollection.count()) {
         addToLibraryButton.disable()
-        removeFromLibraryButton.disable()
+        parameters.disable()
 
-        issueCollection.removeFromLibrary(
+        progressBar.reset().show().max(marvelCollection.count())
+        simpleLogger.reset().show()
+
+        marvelCollection.removeFromLibrary(
             comic => simpleLogger.addLog(comic.title + ' ...', comic.id),
             comic => simpleLogger.addLog(comic.title + ' successfully removed !', comic.id),
             comic => simpleLogger.addLog(comic.title + ' error !!', comic.id),
-            comic => {
-                progressBar.addProgress()
-                if (progressBar.isFinished) {
-                    addToLibraryButton.enable()
-                    removeFromLibraryButton.enable()
-                    AdvancedLogger.appendButtonTo(buttonParentNode)
-                }
-            }
-        )
-    })
-})();
+            comic => progressBar.addProgress()
+        ).then(() => {
+            addToLibraryButton.enable()
+            parameters.enable()
+        })
+    }
+})
+
+onParameterChange().then(() => {
+    if (pageType === PageType.events) {
+        parameters.show()
+    }
+    removeFromLibraryButton.show()
+    console.debug('[MUS]Loaded', pageType, id, match)
+})
+

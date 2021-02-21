@@ -3,46 +3,42 @@ export default class ProgressBar {
     protected progressBarNode!: HTMLDivElement
     protected displayed = false
 
-    protected done:number = 0
-    protected total!: number
+    protected done = 0
+    protected total = 0
 
-    constructor(total: number) {
-        this.total = total
-
-        this.containerNode = document.createElement('div')
-        this.containerNode.style.width = '100%'
-        this.containerNode.style.height = '20px'
-        this.containerNode.style.background = '#fff'
-        this.containerNode.style.margin = '20px 0'
-
-        this.progressBarNode = document.createElement('div')
-        this.progressBarNode.style.background = '#e62429'
-        this.progressBarNode.style.width = '0'
-        this.progressBarNode.style.height = '100%'
-        this.progressBarNode.style.transition = 'width .1s'
-        this.progressBarNode.style.textAlign = 'center'
+    constructor(template: HTMLElement) {
+        this.containerNode = template.querySelector('#mus-progressBarContainer')
+        this.progressBarNode = template.querySelector('#mus-progressBar')
         this.progressBarNode.innerText = '0/' + this.total
-
-        this.containerNode.appendChild(this.progressBarNode)
     }
 
-    public appendTo(node: HTMLElement): ProgressBar {
-        if (!this.displayed) {
-            this.displayed = true
-            node.appendChild(this.containerNode)
-        }
+    public show(): this {
+        this.containerNode.style.display = 'block'
         return this
     }
 
-    public addProgress(step:number = 1) {
+    public hide(): this {
+        this.containerNode.style.display = 'none'
+        return this
+    }
+
+    public addProgress(step:number = 1): this {
         this.done += step
         this.progressBarNode.style.width = (100 * this.done) / this.total + '%'
         this.progressBarNode.innerText = this.done + '/' + this.total
+        return this
     }
 
-    public resetProgress(): ProgressBar {
+    public reset(): this {
         this.done = 0
+        this.total = 0
         this.progressBarNode.style.width = '0%'
+        this.progressBarNode.innerText = '0/??' + this.total
+        return this
+    }
+
+    public max(max: number): this {
+        this.total = max
         this.progressBarNode.innerText = '0/' + this.total
         return this
     }

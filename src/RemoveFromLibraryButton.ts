@@ -1,29 +1,18 @@
 export default class RemoveFromLibraryButton {
     private readonly containerNode!: HTMLDivElement
-    private readonly buttonNode!: HTMLAnchorElement
+    private readonly node!: HTMLAnchorElement
     private onClickFn?: () => void
     protected disabled = false
 
-    public constructor() {
-        this.containerNode = document.createElement('div')
-        this.containerNode.classList.add('shifted-content-footer', 'available-now-footer')
-        this.buttonNode = document.createElement('a')
-        this.buttonNode.classList.add('primary')
-        this.buttonNode.style.cursor = 'pointer'
-        this.buttonNode.innerText = 'Remove from library'
-
-        this.containerNode.append(this.buttonNode)
-
-        this.buttonNode.addEventListener('click', (e) => {
+    public constructor(template: HTMLElement) {
+        this.containerNode = template.querySelector('#mus-removeFromLibraryContainer')
+        this.node = template.querySelector('#mus-removeFromLibraryButton')
+        this.node.addEventListener('click', (e) => {
             e.preventDefault()
-            if (this.onClickFn) {
+            if (this.onClickFn && !this.disabled) {
                 this.onClickFn()
             }
         })
-    }
-
-    public appendTo(node: HTMLElement): void {
-        node.appendChild(this.containerNode);
     }
 
     public onClick(fn: () => void): void {
@@ -39,6 +28,11 @@ export default class RemoveFromLibraryButton {
 
     public enable(): this {
         this.disabled = false
+        return this
+    }
+
+    public show(): this {
+        this.containerNode.style.display = 'block'
         return this
     }
 }
