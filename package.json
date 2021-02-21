@@ -1,6 +1,6 @@
 {
   "name": "marvel-unlimited-series",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "`Marvel Unlimited Series` is a Google Chrome and Brave extension (soon on Firefox) that add a button on Marvel series pages who allow you to add the whole series (only issues available with Marvel Unlimited) to your Marvel Unlimited library.",
   "scripts": {
     "watch": "npm-watch",
