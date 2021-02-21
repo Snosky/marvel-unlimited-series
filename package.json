@@ -4,8 +4,9 @@
   "description": "`Marvel Unlimited Series` is a Google Chrome and Brave extension (soon on Firefox) that add a button on Marvel series pages who allow you to add the whole series (only issues available with Marvel Unlimited) to your Marvel Unlimited library.",
   "scripts": {
     "watch": "npm-watch",
+    "build": "npm run build:chrome && npm run build:firefox",
     "build:chrome": "webpack --env BROWSER=chrome --env RATE_URL='https://chrome.google.com/webstore/detail/marvel-unlimited-series/onoekiemmcckeimlfhenofalncmkedbg'",
-    "build:firefox": "webpack --env BROWSER=firefox"
+    "build:firefox": "webpack --env BROWSER=firefox --env RATE_URL='https://addons.mozilla.org/fr/firefox/addon/marvel-unlimited-series/'"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   },
   "homepage": "https://github.com/Snosky/marvel-unlimited-series#readme",
   "devDependencies": {
+    "@types/chrome": "0.0.132",
     "copy-webpack-plugin": "^7.0.0",
     "html-loader": "^2.1.0",
     "npm-watch": "^0.7.0",
@@ -32,7 +34,10 @@
       "patterns": [
         "src"
       ],
-      "extensions": ["ts", "html"]
+      "extensions": [
+        "ts",
+        "html"
+      ]
     }
   }
 }
