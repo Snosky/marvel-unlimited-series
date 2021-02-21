@@ -1,62 +1,49 @@
+import MarvelComicCollection from "./MarvelComicCollection";
+
 export default class AddToLibraryButton {
-    private readonly buttonNode!: HTMLAnchorElement;
-    private readonly textNode!: HTMLDivElement;
+    protected node!: HTMLElement
+    protected text!: HTMLElement
 
-    private isLoading = false;
-    private previousText = '';
+    protected isLoading = false
+    protected previousText?: string
+    protected isDisabled = false
 
-    private onClickFn?: () => void;
+    public constructor(template: HTMLElement) {
+        this.node = template.querySelector('#mus-addToLibraryButton')
+        this.text = template.querySelector('#mus-addToLibraryButtonText')
+    }
 
-    public constructor() {
-        this.buttonNode = document.createElement('a');
-        this.buttonNode.classList.add('cta-btn', 'cta-btn--solid', 'cta-btn--red', 'active');
-        this.buttonNode.setAttribute('aria-current', 'true');
+    public loading(): this {
+        this.text.innerText = 'Loading...'
+        return this
+    }
 
-        this.textNode = document.createElement('div');
-        this.textNode.classList.add('innerFill');
+    public addToLibrary(comicCount: number): this {
+        this.text.innerText = `Add ${comicCount} issue${comicCount > 0 ? 's' : ''} to Library`
+        return this
+    }
 
-        this.buttonNode.appendChild(this.textNode);
-
-        this.buttonNode.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (this.onClick) {
-                this.onClickFn();
+    public onClick(fn: () => void) {
+        this.node.addEventListener('click', (e) => {
+            e.preventDefault()
+            if (!this.isDisabled) {
+                fn()
             }
         })
     }
 
-    public appendTo(node: HTMLElement): void {
-        node.appendChild(this.buttonNode);
+    public enable() {
+        this.isDisabled = false
+        return this
     }
 
-    public toggleLoading(): void {
-        if (this.isLoading) {
-            this.textNode.innerText = this.previousText;
-        } else {
-            this.previousText = this.textNode.innerText;
-            this.textNode.innerText = 'Loading...';
-        }
-        this.isLoading = !this.isLoading;
+    public disable() {
+        this.isDisabled = true
+        return this
     }
 
-    public onClick(fn: () => void): void {
-        this.onClickFn = fn;
-    }
-
-    public setCustomText(str: string) {
-        this.isLoading = false;
-        this.textNode.innerText = str;
-    }
-
-    public setDefaultText(comicNb?: number) {
-        if (!comicNb) {
-            this.setCustomText('Add serie to library.');
-        } else {
-            this.setCustomText('Add ' + comicNb + ' issue' + (comicNb > 0 ? 's' : '') + ' to Library');
-        }
-    }
-
-    public setErrorText(str: string) {
-        this.setCustomText('ERROR : ' + str);
+    public setText(text: string): this {
+        this.text.innerText = text
+        return this
     }
 }

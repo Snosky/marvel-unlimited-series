@@ -1,0 +1,67 @@
+<style>
+    #mus-removeFromLibraryContainer {
+        display: none;
+    }
+
+    #mus-parametersContainer {
+        margin-bottom: 10px;
+        display: none;
+    }
+    #mus-parametersToggle {
+        font-size: .7em;
+        color: #eb2328;
+        margin: 0 0 5px 0;
+        cursor: pointer;
+    }
+    #mus-parameters { }
+
+    #mus-progressBarContainer {
+        width: 100%;
+        height: 20px;
+        background: #fff;
+        margin: 20px 0;
+        display: none;
+    }
+    #mus-progressBar {
+        background: #e62429;
+        width: 0;
+        height: 100%;
+        transition: width .1s;
+        text-align: center;
+    }
+
+    #mus-simpleLogger {
+        height: 200px;
+        overflow-y: auto;
+        background: #e62429;
+        color: #fff;
+        display: none;
+    }
+    .mus-simpleLog {
+        padding: 2px 5px;
+    }
+</style>
+
+<a href="#" class="cta-btn cta-btn--solid cta-btn--red active" aria-current="true" id="mus-addToLibraryButton">
+    <div class="innerFill" id="mus-addToLibraryButtonText">
+        Loading...
+    </div>
+</a>
+<div class="shifted-content-footer available-now-footer" id="mus-removeFromLibraryContainer">
+    <a href="#" class="primary" id="mus-removeFromLibraryButton">Remove from library</a>
+</div>
+<div id="mus-parametersContainer">
+    <p id="mus-parametersToggle" data-close-text="Close parameters >" data-open-text="Open parameters >"></p>
+    <div id="mus-parameters">
+        <div id="mus-includeTieInIssueContainer">
+            <input type="checkbox" id="mus-includeTieInIssueInput">
+            <label for="mus-includeTieInIssueInput">Include Tie-In issues</label>
+        </div>
+    </div>
+</div>
+
+<div id="mus-progressBarContainer">
+    <div id="mus-progressBar">0/??</div>
+</div>
+
+<div id="mus-simpleLogger"></div>
