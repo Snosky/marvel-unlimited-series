@@ -6,10 +6,16 @@ import ProgressBar from './ProgressBar'
 import SimpleLogger from './SimpleLogger'
 import RemoveFromLibraryButton from './RemoveFromLibraryButton'
 
+declare const process : {
+    env: {
+        RATE_URL: string;
+    }
+}
 enum PageType {
     'events' = 'events',
     'series' = 'series'
 }
+
 let match: RegExpMatchArray
 let pageType: PageType
 if ((match = location.href.match('^.*\/events\/([0-9]+).*$'))) {
@@ -36,7 +42,7 @@ parentNode.append(template)
 const addToLibraryButton = new AddToLibraryButton(template)
 const removeFromLibraryButton = new RemoveFromLibraryButton(template)
 const parameters = new Parameters(template)
-const simpleLogger = new SimpleLogger(template)
+const simpleLogger = new SimpleLogger(template, process.env.RATE_URL)
 const progressBar = new ProgressBar(template)
 let marvelCollection: MarvelComicCollection|undefined
 
