@@ -88,6 +88,7 @@ addToLibraryButton.onClick(() => {
     if (marvelCollection && marvelCollection.count()) {
         addToLibraryButton.disable()
         parameters.disable()
+        removeFromLibraryButton.disable()
 
         progressBar.reset().show().max(marvelCollection.count())
         simpleLogger.reset().show()
@@ -100,6 +101,7 @@ addToLibraryButton.onClick(() => {
         ).then(() => {
             addToLibraryButton.enable()
             parameters.enable()
+            removeFromLibraryButton.enable()
         })
     }
 })
@@ -108,6 +110,7 @@ removeFromLibraryButton.onClick(() => {
     if (marvelCollection && marvelCollection.count()) {
         addToLibraryButton.disable()
         parameters.disable()
+        removeFromLibraryButton.disable()
 
         progressBar.reset().show().max(marvelCollection.count())
         simpleLogger.reset().show()
@@ -120,6 +123,7 @@ removeFromLibraryButton.onClick(() => {
         ).then(() => {
             addToLibraryButton.enable()
             parameters.enable()
+            removeFromLibraryButton.enable()
         })
     }
 })
@@ -129,6 +133,6 @@ onParameterChange().then(() => {
         parameters.show()
     }
     removeFromLibraryButton.show()
-    console.debug('[MUS]Loaded', pageType, id, match)
+    console.debug('[MUS]Loaded', pageType, id)
 })
 
