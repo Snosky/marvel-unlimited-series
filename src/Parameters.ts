@@ -37,6 +37,8 @@ export default class Parameters {
             container: template.querySelector('#mus-includeTieInIssueContainer'),
             input: template.querySelector('#mus-includeTieInIssueInput')
         }
+        this.parameters[AvailableParameter.includeTieInIssues].input.checked = true
+        this.parametersValue[AvailableParameter.includeTieInIssues] = true
         this.parameters[AvailableParameter.includeTieInIssues].input.addEventListener('change', (e) => {
             this.parametersValue[AvailableParameter.includeTieInIssues] = this.parameters[AvailableParameter.includeTieInIssues].input.checked
             this._onChange(AvailableParameter.includeTieInIssues, this.parameters[AvailableParameter.includeTieInIssues].input.checked)
