@@ -34,7 +34,7 @@ let id = parseInt(match[1])
 const template = document.createElement('div')
 template.innerHTML = templateHtml
 const parentNode = document.querySelector(pageType === PageType.events
-        ? '#comics-eventsdetail > div.header-box.grid-container > div > div.details-right'
+        ? '#page-content .grid-container .details-right'
         : '.module .featured-item-info-wrap .featured-item-text'
     )
 parentNode.append(template)
