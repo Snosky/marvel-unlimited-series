@@ -29,7 +29,7 @@ export default class MarvelComicCollection {
                     .then(() => onComicAdded(this.comics[i]))
                     .catch(() => onError(this.comics[i]))
                     .finally(() => always(this.comics[i]))
-            )
+            )            
         }
         return Promise.all(promises)
     }
@@ -72,7 +72,10 @@ export default class MarvelComicCollection {
             tmpNode.innerHTML = coreIssueDOM + tieIssueDOM
             const comicNodes = tmpNode.getElementsByClassName('row-item-image')
             for (let i = 0; i < comicNodes.length; i++) {
-                comics.push(MarvelComic.initFromHtml(comicNodes[i] as HTMLElement))
+                var comic = MarvelComic.initFromHtml(comicNodes[i] as HTMLElement);
+                if (comic != null) {
+                    comics.push(comic)
+                }
             }
             return new MarvelComicCollection(comics, 'event', eventId)
         })
@@ -93,7 +96,10 @@ export default class MarvelComicCollection {
                 tmpNode.innerHTML = issuesDOM.output
                 const comicsNodes = tmpNode.getElementsByClassName('row-item-image')
                 for (let i = 0; i < comicsNodes.length; i++) {
-                    comics.push(MarvelComic.initFromHtml(comicsNodes[i] as HTMLElement))
+                    var comic = MarvelComic.initFromHtml(comicsNodes[i] as HTMLElement);
+                    if (comic != null) {
+                        comics.push(comic)
+                    }
                 }
                 return new MarvelComicCollection(comics, 'series', seriesId)
             })
