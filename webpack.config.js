@@ -2,6 +2,7 @@ const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const ZipPlugin = require('zip-webpack-plugin');
+const PACKAGE = require('./package.json')
 
 module.exports = env => {
     return {
@@ -44,7 +45,7 @@ module.exports = env => {
             }),
             new ZipPlugin({
                 path: 'zip',
-                filename: env.BROWSER + '.zip',
+                filename: env.BROWSER + '-' + PACKAGE.version + '.zip',
             })
         ]
     }
