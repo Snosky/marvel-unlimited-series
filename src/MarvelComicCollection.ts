@@ -65,7 +65,6 @@ export default class MarvelComicCollection {
      * @param includeTieInIssues
      */
     public static buildFromMarvelEvent(eventId: number, includeTieInIssues = false): Promise<MarvelComicCollection> {
-        const comics: MarvelComic[] = []
         const fetchers = [fetch('https://www.marvel.com/comics/list/coreissue/?id=' + eventId).then(r => r.text())]
 
         if (includeTieInIssues) {
