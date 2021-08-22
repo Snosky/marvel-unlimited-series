@@ -1,11 +1,16 @@
 import MarvelComic from './MarvelComic'
 
+enum MarvelComicCollectionType {
+    series = 'series',
+    event = 'event'
+}
+
 export default class MarvelComicCollection {
     protected comics: MarvelComic[] = []
-    protected type?: string
+    protected type?: MarvelComicCollectionType
     protected id?: number
 
-    constructor(comics: MarvelComic[], type?: string, id?: number) {
+    constructor(comics: MarvelComic[], type?: MarvelComicCollectionType, id?: number) {
         this.comics = comics
         this.type = type
         this.id = id
@@ -29,7 +34,7 @@ export default class MarvelComicCollection {
                     .then(() => onComicAdded(this.comics[i]))
                     .catch(() => onError(this.comics[i]))
                     .finally(() => always(this.comics[i]))
-            )            
+            )
         }
         return Promise.all(promises)
     }
@@ -67,18 +72,8 @@ export default class MarvelComicCollection {
             fetchers.push(fetch('https://www.marvel.com/comics/list/tiein/?id=' + eventId).then(r => r.text()))
         }
 
-        return Promise.all(fetchers).then(([coreIssueDOM, tieIssueDOM]) => {
-            const tmpNode = document.createElement('div')
-            tmpNode.innerHTML = coreIssueDOM + tieIssueDOM
-            const comicNodes = tmpNode.getElementsByClassName('row-item-image')
-            for (let i = 0; i < comicNodes.length; i++) {
-                var comic = MarvelComic.initFromHtml(comicNodes[i] as HTMLElement);
-                if (comic != null) {
-                    comics.push(comic)
-                }
-            }
-            return new MarvelComicCollection(comics, 'event', eventId)
-        })
+        return Promise.all(fetchers)
+            .then(([coreIssueDOM, tieIssueDOM]) => this.domToComicCollection(coreIssueDOM + tieIssueDOM, MarvelComicCollectionType.event, eventId))
     }
 
     /**
@@ -87,21 +82,29 @@ export default class MarvelComicCollection {
      * @param seriesId
      */
     public static buildFromMarvelSeries(seriesId: number): Promise<MarvelComicCollection> {
-        const comics: MarvelComic[] = []
-
         return fetch('https://www.marvel.com/comics/show_more?offset=0&tpl=..%2Fpartials%2Fcomic_issue%2Fcomics_singlerow_item.mtpl&byType=comic_series&limit=100000&isDigital=1&byId=' + seriesId)
             .then(r => r.json())
-            .then((issuesDOM) => {
-                const tmpNode = document.createElement('div')
-                tmpNode.innerHTML = issuesDOM.output
-                const comicsNodes = tmpNode.getElementsByClassName('row-item-image')
-                for (let i = 0; i < comicsNodes.length; i++) {
-                    var comic = MarvelComic.initFromHtml(comicsNodes[i] as HTMLElement);
-                    if (comic != null) {
-                        comics.push(comic)
-                    }
-                }
-                return new MarvelComicCollection(comics, 'series', seriesId)
-            })
+            .then((issuesDOM) => this.domToComicCollection(issuesDOM.ouptut, MarvelComicCollectionType.series, seriesId))
+    }
+
+    /**
+     * Build a MarvelComicCollection from DOM
+     * @param dom
+     * @param collectionType
+     * @param collectionId
+     * @protected
+     */
+    protected static domToComicCollection(dom: string, collectionType: MarvelComicCollectionType, collectionId: number): MarvelComicCollection {
+        const comics: MarvelComic[] = []
+        const tmpNode = document.createElement('div')
+        tmpNode.innerHTML = dom
+        const comicsNodes = tmpNode.getElementsByClassName('row-item-image')
+        for (let i = 0; i < comicsNodes.length; i++) {
+            let comic = MarvelComic.initFromHtml(comicsNodes[i] as HTMLElement);
+            if (comic != null) {
+                comics.push(comic)
+            }
+        }
+        return new MarvelComicCollection(comics, collectionType, collectionId)
     }
 }
