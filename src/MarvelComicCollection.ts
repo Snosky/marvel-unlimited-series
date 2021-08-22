@@ -94,7 +94,6 @@ export default class MarvelComicCollection {
      * @protected
      */
     protected static domToComicCollection(dom: string, collectionType: MarvelComicCollectionType, collectionId: number): MarvelComicCollection {
-        console.log('MUS domToComicCollection')
         const comics: MarvelComic[] = []
         const tmpNode = document.createElement('div')
         tmpNode.innerHTML = dom
@@ -103,8 +102,6 @@ export default class MarvelComicCollection {
             let comic = MarvelComic.initFromHtml(comicsNodes[i] as HTMLElement);
             if (comic != null) {
                 comics.push(comic)
-            } else {
-                console.log('mus', comic)
             }
         }
         return new MarvelComicCollection(comics, collectionType, collectionId)
