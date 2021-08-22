@@ -84,7 +84,7 @@ export default class MarvelComicCollection {
     public static buildFromMarvelSeries(seriesId: number): Promise<MarvelComicCollection> {
         return fetch('https://www.marvel.com/comics/show_more?offset=0&tpl=..%2Fpartials%2Fcomic_issue%2Fcomics_singlerow_item.mtpl&byType=comic_series&limit=100000&isDigital=1&byId=' + seriesId)
             .then(r => r.json())
-            .then((issuesDOM) => this.domToComicCollection(issuesDOM.ouptut, MarvelComicCollectionType.series, seriesId))
+            .then((issuesDOM) => this.domToComicCollection(issuesDOM.output, MarvelComicCollectionType.series, seriesId))
     }
 
     /**
@@ -95,6 +95,7 @@ export default class MarvelComicCollection {
      * @protected
      */
     protected static domToComicCollection(dom: string, collectionType: MarvelComicCollectionType, collectionId: number): MarvelComicCollection {
+        console.log('MUS domToComicCollection')
         const comics: MarvelComic[] = []
         const tmpNode = document.createElement('div')
         tmpNode.innerHTML = dom
@@ -103,6 +104,8 @@ export default class MarvelComicCollection {
             let comic = MarvelComic.initFromHtml(comicsNodes[i] as HTMLElement);
             if (comic != null) {
                 comics.push(comic)
+            } else {
+                console.log('mus', comic)
             }
         }
         return new MarvelComicCollection(comics, collectionType, collectionId)
