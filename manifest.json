@@ -10,9 +10,7 @@
   "description": "Add a button on comic series' page from marvel.com, to allow you to add the whole series to your Marvel Unlimited library",
   "manifest_version": 2,
   "permissions": [
-    "activeTab",
-    "https://www.marvel.com/",
-    "storage"
+    "https://www.marvel.com/"
   ],
   "content_scripts": [{
     "js": ["script.js"],
